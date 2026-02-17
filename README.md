@@ -1,63 +1,56 @@
-# Meteor Shower Viewing Prediction
+# Meteor Shower Prediction
 
-## Overview
+Prediction algorithm that determines the **best date and city** to view major meteor showers by cross-referencing **comet debris schedules**, **moon phase brightness**, **constellation visibility by latitude**, and **city locations** worldwide.
 
-A data-driven analysis that combines astronomical event data, geographic coordinates, constellation positions, and lunar phase calendars to predict the optimal viewing conditions and locations for meteor shower observation. The project merges multiple datasets to determine when and where specific meteor showers will be most visible.
+*Built as part of Microsoft's "Explore Space with Python" learning path.*
 
-## Datasets
+## Meteor Showers Analyzed
 
-| File | Description | Size |
-|------|-------------|------|
-| `meteorshowers.csv` | Meteor shower events with dates and radiant points | 455 B |
-| `cities.csv` | City names with geographic coordinates (lat/lon) | 7.3 KB |
-| `constellations.csv` | Constellation position data (right ascension, declination) | 256 B |
-| `moonphases.csv` | Moon phase calendar (new moon, full moon dates) | 5.5 KB |
+| Shower | Parent Comet | Best Month | Radiant Constellation |
+|--------|-------------|------------|----------------------|
+| Lyrids | Thatcher | April | Lyra |
+| Eta Aquarids | Halley | May | Aquarius |
+| Orionids | Halley | October | Orion |
+| Perseids | Swift-Tuttle | August | Perseus |
+| Leonids | Tempel-Tuttle | November | Leo |
 
-## Analysis
+## Algorithm
 
-The notebook performs the following analysis:
+```
+For each city (256 worldwide):
+  1. Check latitude against constellation visibility range
+  2. Check hemisphere match (northern/southern preference)
+  3. For each day in shower's active window:
+     a. Compute moon phase illumination percentage
+     b. If moon brightness < threshold → mark as optimal viewing
+  4. Return best viewing dates ranked by darkness
+```
 
-1. **Data Integration:** Merge meteor shower schedules with constellation positions to determine radiant visibility
-2. **Geographic Filtering:** Cross-reference city locations with constellation visibility windows based on latitude
-3. **Lunar Interference:** Factor in moon phase brightness to identify dark-sky viewing windows
-4. **Prediction:** Generate optimal viewing recommendations combining time, location, and lunar conditions
+### Data Pipeline
 
-### Key Factors Considered
+| Dataset | Records | Source |
+|---------|---------|--------|
+| `meteorshowers.csv` | 5 showers | NASA Solar System Exploration |
+| `moonphases.csv` | 366 days (2020) | timeanddate.com |
+| `constellations.csv` | 5 radiants | Wikipedia (IAU designated) |
+| `cities.csv` | 256 cities | Wikipedia (national capitals by latitude) |
 
-- **Radiant Altitude:** Whether the meteor shower's radiant constellation is above the horizon at the observer's latitude
-- **Moon Phase:** New moon periods provide the darkest skies for optimal viewing
-- **Viewing Window:** Peak activity dates for each meteor shower
-- **Geographic Position:** Latitude-dependent visibility of source constellations
+### Processing Steps
+
+1. **Type Conversion:** Month strings → integers, moon phases → numeric illumination values
+2. **Missing Data:** Forward-fill moon phase data for all 366 days
+3. **Cross-Reference:** Join meteor shower windows with moon phase calendar
+4. **Latitude Filtering:** Match city latitudes to constellation visibility bands
+5. **Prediction:** Output optimal city + date combinations per meteor shower
 
 ## Tech Stack
 
-- **Language:** Python
-- **Libraries:** Pandas, NumPy, Matplotlib
-- **Environment:** Jupyter Notebook
+- **Language:** Python (Jupyter Notebook)
+- **Libraries:** pandas, NumPy
+- **Data Sources:** NASA, timeanddate.com, Wikipedia
 
-## Project Structure
+## Skills Demonstrated
 
-```
-meteor-shower-prediction/
-├── meteor-showers.ipynb    # Complete analysis notebook (57 KB)
-├── meteorshowers.csv       # Meteor shower event data
-├── cities.csv              # City coordinates
-├── constellations.csv      # Constellation positions
-├── moonphases.csv          # Moon phase calendar
-├── README.md
-└── LICENSE
-```
-
-## Getting Started
-
-```bash
-git clone https://github.com/ShubhGTiwari/meteor-shower-prediction.git
-cd meteor-shower-prediction
-
-pip install pandas numpy matplotlib jupyter
-jupyter notebook meteor-showers.ipynb
-```
-
-## License
-
-MIT
+- **Data Engineering:** Multi-source data integration, type conversion, missing value imputation
+- **Algorithm Design:** Multi-constraint optimization (astronomy + geography + lunar cycle)
+- **Domain Knowledge:** Orbital mechanics, meteor shower astronomy, constellation visibility
